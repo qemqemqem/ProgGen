@@ -1,41 +1,22 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 import time
+from progresser import Task, ProgressMaker, make_example_data
 
 app = Flask(__name__)
 
 
-class ProgressMaker:
-    def __init__(self, functions):
-        self.functions = functions
-        self.progress = {}
 
-    def make_progress(self):
-        for func in self.functions:
-            if func.__name__ not in self.progress:
-                self.progress[func.__name__] = "In Progress"
-            else:
-                if self.progress[func.__name__] != "Completed":
-                    self.progress[func.__name__] += "."
-            func(self)
-            self.progress[func.__name__] = "Completed"
-
-    def function_1(self):
-        time.sleep(5)
-
-    def function_2(self):
-        time.sleep(2)
-
-    def function_3(self):
-        time.sleep(1)
-
-
-pm = ProgressMaker([ProgressMaker.function_1, ProgressMaker.function_2, ProgressMaker.function_3])
+pm = ProgressMaker(make_example_data())
 
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/progress')
+def progress():
     pm.make_progress()
-    return jsonify(pm.progress)
+    return jsonify(pm.get_progress_report())
 
 
 if __name__ == '__main__':

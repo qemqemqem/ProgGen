@@ -1,39 +1,25 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Function Tracker</title>
-  </head>
-  <body>
-    <h1>Function Tracker</h1>
-    <h2>Current Function</h2>
-    {% if current_function %}
-      <p>{{ current_function.__name__ }} - In Progress</p>
-    {% else %}
-      <p>No function currently in progress</p>
-    {% endif %}
-    <h2>Completed Functions</h2>
-    {% if completed_functions %}
-      <ul>
-        {% for i, function in enumerate(completed_functions) %}
-          <li>{{ i + 1 }}. {{ function.__name__ }} - Completed</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>No functions have been completed yet</p>
-    {% endif %}
-    <h2>Incomplete Functions</h2>
-    {% if incomplete_functions %}
-      <ul>
-        {% for i, function in enumerate(incomplete_functions) %}
-          {% if i == 0 and not current_function %}
-            <li><em>{{ function.__name__ }} - In Progress</em></li>
-          {% else %}
-            <li>{{ i + 1 }}. {{ function.__name__ }} - Incomplete</li>
-          {% endif %}
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>All functions have been completed</p>
-    {% endif %}
-  </body>
+<head>
+    <title>Progress Monitor</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function updateProgress() {
+            $.getJSON('/progress', function(data) {
+                $('#progress').empty();
+                $.each(data, function(name, status) {
+                    $('#progress').append('<li>' + name + ': ' + status + '</li>');
+                });
+            });
+        }
+        $(function() {
+            updateProgress();
+            setInterval(updateProgress, 1000);
+        });
+    </script>
+</head>
+<body>
+    <h1>Progress Monitor</h1>
+    <ul id="progress"></ul>
+</body>
 </html>

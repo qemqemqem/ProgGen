@@ -65,6 +65,35 @@ class ProgressMaker:
                 task.run()
         self.update_task_lists()
 
+    def get_progress_report(self):
+        # Return a dict with the number of tasks in each state
+        deets = {
+            "num_completed": len(self.completed_tasks),
+            "num_incomplete": len(self.incomplete_tasks),
+            "num_in_progress": len(self.in_progress_tasks),
+            "num_done_with_error": len(self.done_with_error),
+            # "completed": self.completed_tasks,
+            # "incomplete": self.incomplete_tasks,
+            # "in_progress": self.in_progress_tasks,
+            # "done_with_error": self.done_with_error,
+            "tasks": [f"{t.name} - {t.class_type} - DONE: {t.done} ERROR:{t.error} READY TO START: {t.ready_to_start}\n" for t in self.tasks],
+            "all_done": len(self.incomplete_tasks) == 0,
+        }
+        for t in self.tasks:
+            deets[t.name] = {
+                "name": t.name,
+                "class_type": t.class_type,
+                "done": t.done,
+                "error": t.error,
+                "error_message": t.error_message,
+                "error_traceback": t.error_traceback,
+                "start_time": t.start_time,
+                "end_time": t.end_time,
+                "duration": t.duration,
+                "result": t.result,
+            }.__str__()
+        return deets
+
 def make_example_data(num_fns = 10):
     def make_fn(i):
         def fn():
