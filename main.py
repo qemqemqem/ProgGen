@@ -1,42 +1,42 @@
-from flask import Flask, render_template
+from flask import Flask, jsonify
 import time
-
-def get_functions_to_run():
-    fns = []
-    for i in range(10):
-        # A function that weights 1 second to run
-        fns.append(lambda: time.sleep(1))
-    return fns
 
 app = Flask(__name__)
 
-class FunctionTracker:
-    def __init__(self):
-        self.functions = get_functions_to_run()
-        self.current_function_index = -1
 
-    def get_current_function(self):
-        if self.current_function_index < 0:
-            return None
-        elif self.current_function_index >= len(self.functions):
-            return None
-        else:
-            return self.functions[self.current_function_index]
+class ProgressMaker:
+    def __init__(self, functions):
+        self.functions = functions
+        self.progress = {}
 
-    def get_completed_functions(self):
-        return self.functions[:self.current_function_index]
+    def make_progress(self):
+        for func in self.functions:
+            if func.__name__ not in self.progress:
+                self.progress[func.__name__] = "In Progress"
+            else:
+                if self.progress[func.__name__] != "Completed":
+                    self.progress[func.__name__] += "."
+            func(self)
+            self.progress[func.__name__] = "Completed"
 
-    def get_incomplete_functions(self):
-        return self.functions[self.current_function_index:]
+    def function_1(self):
+        time.sleep(5)
 
-function_tracker = FunctionTracker()
+    def function_2(self):
+        time.sleep(2)
 
-@app.route("/")
+    def function_3(self):
+        time.sleep(1)
+
+
+pm = ProgressMaker([ProgressMaker.function_1, ProgressMaker.function_2, ProgressMaker.function_3])
+
+
+@app.route('/')
 def index():
-    current_function = function_tracker.get_current_function()
-    completed_functions = function_tracker.get_completed_functions()
-    incomplete_functions = function_tracker.get_incomplete_functions()
-    return render_template("index.html", current_function=current_function, completed_functions=completed_functions, incomplete_functions=incomplete_functions, enumerate=enumerate)
+    pm.make_progress()
+    return jsonify(pm.progress)
 
-if __name__ == "__main__":
-    app.run()
+
+if __name__ == '__main__':
+    app.run(debug=True)

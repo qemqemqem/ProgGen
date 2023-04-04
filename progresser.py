@@ -10,6 +10,7 @@ class Task:
         self.function = function
         self.progress = 0
         self.total = 0
+        self.ready_to_start = True
         self.working = False
         self.done = False
         self.error = False
@@ -20,45 +21,63 @@ class Task:
         self.duration = None
         self.result = None
 
+    def _run(self):
+        # Run function in background thread, mark done when done
+        try:
+            self.result = self.function()
+        except Exception as e:
+            self.error = True
+            self.error_message = str(e)
+            self.error_traceback = traceback.format_exc()
+        finally:
+            self.done = True
+            self.working = False
+            self.end_time = time.time()
+            self.duration = self.end_time - self.start_time
+
+    def run(self):
+        # Start function in background thread, mark done when done
+        self.working = True
+        self.ready_to_start = False
+        self.start_time = time.time()
+        thread = threading.Thread(target=self._run)
+        thread.start()
+
 class ProgressMaker:
     def __init__(self, tasks: list[Task] = None):
         self.tasks = tasks or []
-        self.current_task_index = -1
-        self.current_task = None
         self.completed_tasks = []
         self.incomplete_tasks = []
+        self.in_progress_tasks = []
+        self.done_with_error = []
+        self.update_task_lists()
 
-    def get_current_task(self):
-        if self.current_task_index < 0:
-            return None
-        elif self.current_task_index >= len(self.tasks):
-            return None
-        else:
-            return self.tasks[self.current_task_index]
-
-    def _run_current_task(self):
-        try:
-            self.current_task.result = self.current_task.function()
-        except Exception as e:
-            self.current_task.error = True
-            self.current_task.error_message = str(e)
-            self.current_task.error_traceback = traceback.format_exc()
-        finally:
-            self.current_task.working = False
-            self.current_task.done = True
-            self.current_task.end_time = time.time()
-            self.current_task.duration = self.current_task.end_time - self.current_task.start_time
-            self.completed_tasks.append(self.current_task)
-            self.current_task = None
+    def update_task_lists(self):
+        self.completed_tasks = [t for t in self.tasks if t.done]
+        self.incomplete_tasks = [t for t in self.tasks if not t.done]
+        self.in_progress_tasks = [t for t in self.tasks if t.working]
+        self.done_with_error = [t for t in self.tasks if t.error]
 
     def make_progress(self):
-        # If there is a current task in progress, return, otherwise start the next task in a background thread
-        if self.current_task is not None:
-            return
+        # Find tasks that are ready to start and start them, then update task lists
+        for task in self.tasks:
+            if task.ready_to_start:
+                task.run()
+        self.update_task_lists()
 
-        self.current_task_index += 1
-        self.current_task = self.get_current_task()
-        self.current_task.working = True
-        self.current_task.start_time = time.time()
-        self.incomplete_tasks = self.tasks[self.current_task_index:]
-        threading.Thread(target=self._run_current_task).start()
+def make_example_data(num_fns = 10):
+    def make_fn(i):
+        def fn():
+            time.sleep(i * 2)
+            print(f"Task {i} completed")
+            return i
+        return fn
+    return [Task(f"Task {i}", "Waiting", make_fn(i)) for i in range(num_fns)]
+
+if __name__ == "__main__":
+    pm = ProgressMaker(make_example_data())
+    while len(pm.incomplete_tasks) > 0:
+        pm.make_progress()
+        time.sleep(1)
+        print(f"Num Completed: {len(pm.completed_tasks)}, Num Incomplete: {len(pm.incomplete_tasks)}")
+    print("Done!")
