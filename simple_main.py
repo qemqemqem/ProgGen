@@ -5,6 +5,7 @@ import time
 from content_procurement import get_silly_prompt
 from gpt.gpt import prompt_completion_chat
 from flask import Flask, render_template, request
+from dalle.dalle import generate_image_and_return_url
 
 app = Flask(__name__)
 
@@ -30,7 +31,7 @@ def index():
     else:
         text = ss.description
         bottom_text = '\n\n'.join(ss.paragraphs)
-        image_url = '/static/tmp.jpeg'
+        image_url = '/static/tmp.jpeg' if ss.picture is None else ss.picture
     return render_template('simple_index.html', text=text, bottom_text=bottom_text, image_url=image_url)
 
 
@@ -53,7 +54,9 @@ def create_simple_story():
     ss.description = story_description
     ss.recently_updated = True
 
-    # TODO Get a picture from DALLE
+    # Get a picture from DALLE
+    ss.picture = generate_image_and_return_url(story_description)
+    ss.recently_updated = True
 
     # Simple story structure
     # Setting the scene
