@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Simple Story Generation</title>
+    <style>
+      .small-image {
+        width: 200px;
+        height: 200px;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      function shouldRefresh() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/should_refresh', false);
+        xhr.send();
+        return xhr.responseText === 'True';
+      }
+
+      function refreshPage() {
+        setTimeout(function() {
+          if (shouldRefresh()) {
+            location.reload();
+          } else {
+            refreshPage();
+          }
+        }, 1000);  // check every second
+      }
+
+      window.onload = function() {
+        refreshPage();
+      }
+    </script>
+  </head>
+  <body>
+    <form method="POST" action="/">
+      <input type="text" name="text">
+      <input type="text" name="bottom_text">
+      <input type="text" name="image_url">
+      <button type="submit">Update</button>
+    </form>
+    <div><br>{{ text }}<br></div>
+    <img src="{{ image_url }}" class="small-image">
+    {% if bottom_text %}
+    <div>{{ bottom_text }}</div>
+    {% endif %}
+  </body>
+</html>
