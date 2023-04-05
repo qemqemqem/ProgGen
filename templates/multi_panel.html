@@ -76,7 +76,7 @@
 <body>
 <!-- Left Panel -->
 <div class="panel">
-    <h2>Story Parameters</h2>
+    <h2 style="text-align: center;">Story Parameters</h2>
     <form method="post" action="{{ url_for('new_story') }}">
         <label for="tone">A one sentence story that is:</label>
         <input type="text" id="tone" name="tone" value="{{ tone }}"><br>
@@ -98,7 +98,7 @@
 <div class="panel center-panel">
     <h2>The Story So Far</h2>
     <pre><br>{{ top_text }}<br></pre>
-    <img src="{{ image_url }}" class="small-image">
+    <img src="{{ image_url }}" class="small-image" style="width: 256px; height: 256px;">
     {#    {% if bottom_text %}#}
     <pre style="text-align: left;">{{ bottom_text }}</pre>
     {#    {% endif %}#}
@@ -106,12 +106,8 @@
 
 <!-- Right Panel -->
 <div class="panel">
-    <h2>Deets</h2>
-    <pre>{
-    "name": "John Doe",
-    "age": 30,
-    "city": "New York"
-}</pre>
+    <h2 style="text-align: center;">Deets</h2>
+    <pre>{{ details_panel }}</pre>
 </div>
 </body>
 </html>

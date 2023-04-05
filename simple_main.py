@@ -7,6 +7,7 @@ from content_data import Story
 from content_procurement import get_parametric_prompt
 from dalle.dalle import generate_image_and_return_url
 from gpt.gpt import prompt_completion_chat
+from progresser import ProgressMaker
 
 app = Flask(__name__)
 
@@ -14,10 +15,12 @@ ss = Story()
 print("Made story: ", ss.tone, ss.protagonist, ss.macguffin, ss.style)
 recently_updated = False
 
+pm = ProgressMaker([])
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global ss
+    global ss, pm
     print("Index being called!")
     if request.method == 'POST':
         text = request.form['text']
@@ -28,7 +31,7 @@ def index():
         bottom_text = '\n\n'.join(ss.paragraphs)
         image_url = '/static/tmp.jpeg' if ss.picture is None else ss.picture
     print("Rendering story: ", ss.tone, ss.protagonist, ss.macguffin, ss.style)
-    return render_template('multi_panel.html', top_text=text, bottom_text=bottom_text, image_url=image_url, tone=ss.tone, protagonist=ss.protagonist, macguffin=ss.macguffin, style_inspo=ss.style)
+    return render_template('multi_panel.html', top_text=text, bottom_text=bottom_text, image_url=image_url, tone=ss.tone, protagonist=ss.protagonist, macguffin=ss.macguffin, style_inspo=ss.style, details_panel=str(pm.get_progress_report()))
 
 
 def create_simple_story():
