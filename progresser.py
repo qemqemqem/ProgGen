@@ -2,59 +2,9 @@ import threading
 import time
 import traceback
 
+from task import Task
+from story_filler import StoryFiller
 
-class Task:
-    def __init__(self, name, class_type: str, function):
-        self.name = name
-        self.class_type = class_type
-        self.function = function
-        self.progress = 0
-        self.total = 0
-        self.ready_to_start = True
-        self.working = False
-        self.done = False
-        self.error = False
-        self.error_message = ""
-        self.error_traceback = ""
-        self.start_time = None
-        self.end_time = None
-        self.duration = None
-        self.result = None
-
-    def get_status(self):
-        # Return a string with the status of the task
-        if self.error:
-            return "Error" + (f": {self.error_message}" if self.error_message else "")
-        elif self.done:
-            return "Done"
-        elif self.working:
-            return "Working"
-        elif self.ready_to_start:
-            return "Ready to Start"
-        else:
-            return "Unknown"
-
-    def _run(self):
-        # Run function in background thread, mark done when done
-        try:
-            self.result = self.function()
-        except Exception as e:
-            self.error = True
-            self.error_message = str(e)
-            self.error_traceback = traceback.format_exc()
-        finally:
-            self.done = True
-            self.working = False
-            self.end_time = time.time()
-            self.duration = self.end_time - self.start_time
-
-    def run(self):
-        # Start function in background thread, mark done when done
-        self.working = True
-        self.ready_to_start = False
-        self.start_time = time.time()
-        thread = threading.Thread(target=self._run)
-        thread.start()
 
 class ProgressMaker:
     def __init__(self, tasks: list[Task] = None):
@@ -65,6 +15,7 @@ class ProgressMaker:
         self.done_with_error = []
         self.all_results = []
         self.update_task_lists()
+        self.get_next_task = None
 
     def update_task_lists(self):
         self.completed_tasks = [t for t in self.tasks if t.done]
@@ -74,10 +25,16 @@ class ProgressMaker:
         self.all_results = [t.result for t in self.tasks if t.done]
 
     def make_progress(self):
-        # Find tasks that are ready to start and start them, then update task lists
+        # Find tasks that are ready to start and start them
         for task in self.tasks:
             if task.ready_to_start:
                 task.run()
+        # Add new tasks to the list, if needed
+        if self.get_next_task:
+            next_task = self.get_next_task()
+            if next_task:
+                self.tasks.append(next_task)
+        # Bookkeeping
         self.update_task_lists()
 
     def get_progress_report(self):
@@ -111,6 +68,7 @@ class ProgressMaker:
             }.__str__()
         return deets
 
+
 def make_example_data(num_fns = 10):
     def make_fn(i):
         def fn():
@@ -120,8 +78,11 @@ def make_example_data(num_fns = 10):
         return fn
     return [Task(f"Task {i}", "Waiting", make_fn(i)) for i in range(num_fns)]
 
+
 if __name__ == "__main__":
+    story_filler = StoryFiller()
     pm = ProgressMaker(make_example_data())
+    pm.get_next_task = story_filler.get_next_task
     while len(pm.incomplete_tasks) > 0:
         pm.make_progress()
         time.sleep(1)
