@@ -21,6 +21,19 @@ class Task:
         self.duration = None
         self.result = None
 
+    def get_status(self):
+        # Return a string with the status of the task
+        if self.error:
+            return "Error" + (f": {self.error_message}" if self.error_message else "")
+        elif self.done:
+            return "Done"
+        elif self.working:
+            return "Working"
+        elif self.ready_to_start:
+            return "Ready to Start"
+        else:
+            return "Unknown"
+
     def _run(self):
         # Run function in background thread, mark done when done
         try:
@@ -50,6 +63,7 @@ class ProgressMaker:
         self.incomplete_tasks = []
         self.in_progress_tasks = []
         self.done_with_error = []
+        self.all_results = []
         self.update_task_lists()
 
     def update_task_lists(self):
@@ -57,6 +71,7 @@ class ProgressMaker:
         self.incomplete_tasks = [t for t in self.tasks if not t.done]
         self.in_progress_tasks = [t for t in self.tasks if t.working]
         self.done_with_error = [t for t in self.tasks if t.error]
+        self.all_results = [t.result for t in self.tasks if t.done]
 
     def make_progress(self):
         # Find tasks that are ready to start and start them, then update task lists
@@ -78,17 +93,19 @@ class ProgressMaker:
             # "done_with_error": self.done_with_error,
             "tasks": [f"{t.name} - {t.class_type} - DONE: {t.done} ERROR:{t.error} READY TO START: {t.ready_to_start}\n" for t in self.tasks],
             "all_done": len(self.incomplete_tasks) == 0,
+            "all_results": "\n".join([str(r) for r in self.all_results]),
         }
         for t in self.tasks:
             deets[t.name] = {
                 "name": t.name,
                 "class_type": t.class_type,
-                "done": t.done,
-                "error": t.error,
-                "error_message": t.error_message,
-                "error_traceback": t.error_traceback,
-                "start_time": t.start_time,
-                "end_time": t.end_time,
+                "status": t.get_status(),
+                # "done": t.done,
+                # "error": t.error,
+                # "error_message": t.error_message,
+                # "error_traceback": t.error_traceback,
+                # "start_time": t.start_time,
+                # "end_time": t.end_time,
                 "duration": t.duration,
                 "result": t.result,
             }.__str__()
