@@ -2,10 +2,11 @@ import random
 import threading
 import time
 
-from content_procurement import get_silly_prompt
-from gpt.gpt import prompt_completion_chat
 from flask import Flask, render_template, request
+
+from content_procurement import get_silly_prompt
 from dalle.dalle import generate_image_and_return_url
+from gpt.gpt import prompt_completion_chat
 
 app = Flask(__name__)
 
@@ -23,7 +24,7 @@ ss = SimpleStory()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    print("Being called!")
+    print("Index being called!")
     if request.method == 'POST':
         text = request.form['text']
         bottom_text = request.form['bottom_text']
@@ -32,14 +33,14 @@ def index():
         text = ss.description
         bottom_text = '\n\n'.join(ss.paragraphs)
         image_url = '/static/tmp.jpeg' if ss.picture is None else ss.picture
-    return render_template('simple_index.html', text=text, bottom_text=bottom_text, image_url=image_url)
+    return render_template('multi_panel.html', top_text=text, bottom_text=bottom_text, image_url=image_url)
 
 
 def refresh_page():
     while True:
         time.sleep(5)  # refresh every n seconds
         # with app.test_request_context():
-            # Perform any server-side updates here
+        # Perform any server-side updates here
         i = random.randint(0, 100)
         print("Got random number {}".format(i))
         ss.description = "Random number {}".format(i)
@@ -89,7 +90,6 @@ def create_simple_story():
     ss.recently_updated = True
 
 
-
 @app.route('/should_refresh')
 def should_refresh():
     ru = ss.recently_updated
@@ -97,7 +97,17 @@ def should_refresh():
     return str(ru)
 
 
-if __name__ == '__main__':
-    refresh_thread = threading.Thread(target=create_simple_story)
-    refresh_thread.start()
-    app.run(debug=True)
+@app.route('/run_function', methods=['POST'])
+def run_function():
+    param1 = request.form['param1']
+    param2 = request.form['param2']
+    param3 = request.form['param3']
+    param4 = request.form['param4']
+
+    print("BUTTON PRESSED!", param1, param2, param3, param4)
+
+
+print("Thread time")
+refresh_thread = threading.Thread(target=create_simple_story)
+refresh_thread.start()
+app.run(debug=True)

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My HTML Page</title>
+    <style>
+        /* Define the styles for the panels */
+        .panel {
+            display: inline-block;
+            vertical-align: top;
+            width: 30%;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid black;
+            box-sizing: border-box;
+        }
+
+        /* Define the styles for the input boxes */
+        input {
+            display: block;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Define the styles for the button */
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Define the styles for the JSON panel */
+        pre {
+            white-space: pre-wrap;
+        }
+
+        /* Define the styles for the center panel */
+        .center-panel {
+            text-align: center;
+        }
+
+        .center-panel img {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function shouldRefresh() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/should_refresh', false);
+            xhr.send();
+            return xhr.responseText === 'True';
+        }
+
+        function refreshPage() {
+            setTimeout(function () {
+                if (shouldRefresh()) {
+                    location.reload();
+                } else {
+                    refreshPage();
+                }
+            }, 1000);  // check every second
+        }
+
+        window.onload = function () {
+            refreshPage();
+        }
+    </script>
+</head>
+<body>
+<!-- Left Panel -->
+<div class="panel">
+    <h2>Story Parameters</h2>
+    <form method="post" action="{{ url_for('run_function') }}">
+        <label for="param1">Parameter 1:</label>
+        <input type="text" id="param1" name="param1"><br>
+
+        <label for="param2">Parameter 2:</label>
+        <input type="text" id="param2" name="param2"><br>
+
+        <label for="param3">Parameter 3:</label>
+        <input type="text" id="param3" name="param3"><br>
+
+        <label for="param4">Parameter 4:</label>
+        <input type="text" id="param4" name="param4"><br>
+
+        <input type="submit" value="Run Function">
+    </form>
+</div>
+
+<!-- Center Panel -->
+<div class="panel center-panel">
+    <h2>The Story So Far</h2>
+    <pre><br>{{ top_text }}<br></pre>
+    <img src="{{ image_url }}" class="small-image">
+    {#    {% if bottom_text %}#}
+    <pre style="text-align: left;">{{ bottom_text }}</pre>
+    {#    {% endif %}#}
+</div>
+
+<!-- Right Panel -->
+<div class="panel">
+    <h2>JSON</h2>
+    <pre>{
+    "name": "John Doe",
+    "age": 30,
+    "city": "New York"
+}</pre>
+</div>
+</body>
+</html>
