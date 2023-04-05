@@ -39,10 +39,10 @@
       <input type="text" name="image_url">
       <button type="submit">Update</button>
     </form>
-    <div><br>{{ text }}<br></div>
+    <pre><br>{{ text }}<br></pre>
     <img src="{{ image_url }}" class="small-image">
     {% if bottom_text %}
-    <div>{{ bottom_text }}</div>
+    <pre>{{ bottom_text }}</pre>
     {% endif %}
   </body>
 </html>
