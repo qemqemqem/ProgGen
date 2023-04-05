@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My HTML Page</title>
+    <title>Story Generation</title>
     <style>
         /* Define the styles for the panels */
         .panel {
@@ -77,20 +77,20 @@
 <!-- Left Panel -->
 <div class="panel">
     <h2>Story Parameters</h2>
-    <form method="post" action="{{ url_for('run_function') }}">
-        <label for="param1">Parameter 1:</label>
-        <input type="text" id="param1" name="param1"><br>
+    <form method="post" action="{{ url_for('new_story') }}">
+        <label for="tone">A one sentence story that is:</label>
+        <input type="text" id="tone" name="tone" value="{{ tone }}"><br>
 
-        <label for="param2">Parameter 2:</label>
-        <input type="text" id="param2" name="param2"><br>
+        <label for="protagonist">About a:</label>
+        <input type="text" id="protagonist" name="protagonist" value="{{ protagonist }}"><br>
 
-        <label for="param3">Parameter 3:</label>
-        <input type="text" id="param3" name="param3"><br>
+        <label for="macguffin">Who goes on an adventure and finds:</label>
+        <input type="text" id="macguffin" name="macguffin" value="{{ macguffin }}"><br>
 
-        <label for="param4">Parameter 4:</label>
-        <input type="text" id="param4" name="param4"><br>
+        <label for="style_inspo">In the style of:</label>
+        <input type="text" id="style_inspo" name="style_inspo" value="{{ style_inspo }}"><br>
 
-        <input type="submit" value="Run Function">
+        <input type="submit" value="New Story">
     </form>
 </div>
 
@@ -106,7 +106,7 @@
 
 <!-- Right Panel -->
 <div class="panel">
-    <h2>JSON</h2>
+    <h2>Deets</h2>
     <pre>{
     "name": "John Doe",
     "age": 30,
