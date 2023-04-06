@@ -11,11 +11,11 @@ from progresser import ProgressMaker
 
 app = Flask(__name__)
 
-ss = Story()
+pm = ProgressMaker([])
+
+ss = pm.story_filler.story
 print("Made story: ", ss.tone, ss.protagonist, ss.macguffin, ss.style)
 recently_updated = False
-
-pm = ProgressMaker([])
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -88,7 +88,7 @@ def should_refresh():
 
 @app.route('/new_story', methods=['POST'])
 def new_story():
-    global ss, recently_updated
+    global ss, recently_updated, pm
     print("Making a new story")
     recently_updated = True
 
@@ -99,7 +99,8 @@ def new_story():
 
     print("BUTTON PRESSED!", tone, protagonist, macguffin, style_inspo)
 
-    ss = Story()
+    pm.story_filler.story = Story()
+    ss = pm.story_filler.story
     ss.tone = tone
     ss.protagonist = protagonist
     ss.macguffin = macguffin
@@ -115,4 +116,4 @@ if __name__ == "__main__":
     print("Thread time")
     refresh_thread = threading.Thread(target=create_simple_story)
     refresh_thread.start()
-    app.run(debug=True)
+    app.run(debug=False)

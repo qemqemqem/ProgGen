@@ -20,6 +20,7 @@ class Task:
         self.end_time = None
         self.duration = None
         self.result = None
+        self.required_tasks = []
 
     def get_status(self):
         # Return a string with the status of the task
