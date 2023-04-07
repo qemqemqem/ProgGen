@@ -1,6 +1,5 @@
 import time
 
-from story_filler import StoryFiller
 from task import Task
 
 
@@ -14,7 +13,6 @@ class TaskManager:
         self.all_results = []
         self.update_task_lists()
         self.get_next_task = None
-        self.story_filler = StoryFiller()
 
     def update_task_lists(self):
         self.completed_tasks = [t for t in self.tasks if t.done]
@@ -30,41 +28,24 @@ class TaskManager:
                 task.run()
         # Add new tasks to the list, if needed
         if self.get_next_task:
-            next_task = self.get_next_task()
+            next_task = self.get_next_task(self)
             if next_task:
                 self.tasks.append(next_task)
         # Bookkeeping
         self.update_task_lists()
+        # If at this point there are no incomplete tasks, we're done
 
     def get_progress_report(self):
-        # Return a dict with the number of tasks in each state
-        deets = {
-            "num_completed": len(self.completed_tasks),
-            "num_incomplete": len(self.incomplete_tasks),
-            "num_in_progress": len(self.in_progress_tasks),
-            "num_done_with_error": len(self.done_with_error),
-            # "completed": self.completed_tasks,
-            # "incomplete": self.incomplete_tasks,
-            # "in_progress": self.in_progress_tasks,
-            # "done_with_error": self.done_with_error,
-            "tasks": [f"{t.name} - {t.class_type} - DONE: {t.done} ERROR:{t.error} READY TO START: {t.ready_to_start}\n" for t in self.tasks],
-            "all_done": len(self.incomplete_tasks) == 0,
-            "all_results": "\n".join([str(r) for r in self.all_results]),
-        }
+        deets = f"num completed: {len(self.completed_tasks)}\n"
+        deets += f"num incomplete: {len(self.incomplete_tasks)}\n"
+        deets += f"num in progress: {len(self.in_progress_tasks)}\n"
+        deets += f"num done with error: {len(self.done_with_error)}\n"
+        deets += f"all done: {len(self.incomplete_tasks) == 0}\n"
+        deets += "\nTASKS:\n"
         for t in self.tasks:
-            deets[t.name] = {
-                "name": t.name,
-                "class_type": t.class_type,
-                "status": t.get_status(),
-                # "done": t.done,
-                # "error": t.error,
-                # "error_message": t.error_message,
-                # "error_traceback": t.error_traceback,
-                # "start_time": t.start_time,
-                # "end_time": t.end_time,
-                "duration": t.duration,
-                "result": t.result,
-            }.__str__()
+            print("t", t)
+            deets += f"{t.name}, - STATUS: {t.get_status()}\n"
+
         return deets
 
 
@@ -81,10 +62,11 @@ def make_example_data(num_fns=10):
 
 
 if __name__ == "__main__":
-    pm = TaskManager(make_example_data())
-    pm.get_next_task = pm.story_filler.get_next_task
-    while len(pm.incomplete_tasks) > 0:
-        pm.make_progress()
+    task_manager = TaskManager(make_example_data())
+    task_manager.get_next_task = task_manager.story_filler.get_next_task
+    while len(task_manager.incomplete_tasks) > 0:
+        task_manager.make_progress()
         time.sleep(1)
-        print(f"Num Completed: {len(pm.completed_tasks)}, Num Incomplete: {len(pm.incomplete_tasks)}")
+        print(
+            f"Num Completed: {len(task_manager.completed_tasks)}, Num Incomplete: {len(task_manager.incomplete_tasks)}")
     print("Done!")

@@ -52,7 +52,7 @@ class Scene:
 class Story:
     def __init__(self):
         self.name = "Story"
-        self.description = "Loading..."
+        self.description = ""
         self.initialized = False
         self.characters = []
         self.locations = []
@@ -61,9 +61,18 @@ class Story:
         self.scenes = []
         self.paragraphs = []
         self.picture = None
+        self.content_recently_updated = False  # Used by the UI to know when to update the content
 
         # Parameters
-        self.tone = random.choice(['silly', 'arrogant', 'fun', 'crazy', 'stupid', 'dumb', 'smart', 'clever', 'funny', 'fun', 'interesting', 'boring', 'bland'])
-        self.protagonist = random.choice(['dog', 'bird', 'elephant', 'weasel', 'mongoose', 'cat', 'blue jay', 'stranger', 'wizard'])
-        self.macguffin = random.choice(['gold', 'true love', 'a new friend', 'a new enemy', 'a new home', 'a new family', 'a new job', 'a new life', 'a new purpose', 'a new meaning', 'a new reason to live', 'the greatest treasure of all', 'bees!', 'a magic portal'])
-        self.style = random.choice(['JK Rowling', 'JRR Tolkien', 'Octavia Butler', 'The King James Bible', 'Shakespeare', 'Mark Twain', 'a technical manual', 'hacker leet speak', 'the Spanish language', 'the US Patent Office'])
+        self.tone = random.choice(
+            ['silly', 'arrogant', 'fun', 'crazy', 'stupid', 'dumb', 'smart', 'clever', 'funny', 'fun', 'interesting',
+             'boring', 'bland'])
+        self.protagonist = random.choice(
+            ['dog', 'bird', 'elephant', 'weasel', 'mongoose', 'cat', 'blue jay', 'stranger', 'wizard'])
+        self.macguffin = random.choice(
+            ['gold', 'true love', 'a new friend', 'a new enemy', 'a new home', 'a new family', 'a new job',
+             'a new life', 'a new purpose', 'a new meaning', 'a new reason to live', 'the greatest treasure of all',
+             'bees!', 'a magic portal'])
+        self.style = random.choice(
+            ['JK Rowling', 'JRR Tolkien', 'Octavia Butler', 'The King James Bible', 'Shakespeare', 'Mark Twain',
+             'a technical manual', 'hacker leet speak', 'the Spanish language', 'the US Patent Office'])

@@ -56,3 +56,6 @@ class Task:
         self.start_time = time.time()
         thread = threading.Thread(target=self._run)
         thread.start()
+
+    def __str__(self):
+        return f"{self.name} - {self.class_type} - STATUS: {self.get_status()}"
