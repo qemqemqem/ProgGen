@@ -28,13 +28,13 @@ def index():
         image_url = request.form['image_url']
     else:
         text = story.description if story.description != "" else "Loading..."
-        bottom_text = '\n\n'.join(story.paragraphs) if len(story.paragraphs) > 0 else "Writing Story..."
+        bottom_text = '\n\n'.join([s.text for s in story.scenes]) if len(story.scenes) > 0 else "Writing Story..."
         image_url = '/static/tmp.jpeg' if story.picture is None else story.picture
     print("Rendering story: ", story.tone, story.protagonist, story.macguffin, story.style)
     return render_template('multi_panel.html', top_text=text, bottom_text=bottom_text, image_url=image_url,
                            tone=story.tone, protagonist=story.protagonist, macguffin=story.macguffin,
                            style_inspo=story.style,
-                           details_panel=str(task_manager.get_progress_report()))
+                           details_panel=str(task_manager.get_progress_report() + "\n\n" + story_filler.get_outline_text()))
 
 
 @app.route('/should_refresh')

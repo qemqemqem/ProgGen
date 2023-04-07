@@ -48,6 +48,12 @@ class Scene:
         self.events = []
 
 
+class StoryElement:
+    def __init__(self, prompt, text):
+        self.prompt = prompt
+        self.text = text
+
+
 @dataclass
 class Story:
     def __init__(self):
@@ -58,8 +64,8 @@ class Story:
         self.locations = []
         self.items = []
         self.events = []
-        self.scenes = []
-        self.paragraphs = []
+        self.scenes: list[StoryElement] = []
+        # self.paragraphs = []
         self.picture = None
         self.content_recently_updated = False  # Used by the UI to know when to update the content
 
