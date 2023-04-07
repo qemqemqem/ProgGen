@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, render_template
 import time
-from progresser import Task, ProgressMaker, make_example_data
+from task_manager import Task, TaskManager, make_example_data
 from content_procurement import make_example_data_gpt
 
 app = Flask(__name__)
 
-pm = ProgressMaker(make_example_data_gpt())
+pm = TaskManager(make_example_data_gpt())
 
 
 @app.route('/')

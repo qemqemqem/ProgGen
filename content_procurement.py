@@ -1,7 +1,7 @@
 import random
 import time
 
-from progresser import Task
+from task_manager import Task
 from gpt.gpt import prompt_completion, prompt_completion_chat
 
 

@@ -6,7 +6,7 @@ from task import Task
 from story_filler import StoryFiller
 
 
-class ProgressMaker:
+class TaskManager:
     def __init__(self, tasks: list[Task] = None):
         self.tasks = tasks or []
         self.completed_tasks = []
@@ -81,7 +81,7 @@ def make_example_data(num_fns = 10):
 
 if __name__ == "__main__":
     story_filler = StoryFiller()
-    pm = ProgressMaker(make_example_data())
+    pm = TaskManager(make_example_data())
     pm.get_next_task = story_filler.get_next_task
     while len(pm.incomplete_tasks) > 0:
         pm.make_progress()
