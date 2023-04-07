@@ -1,9 +1,7 @@
-import threading
 import time
-import traceback
 
-from task import Task
 from story_filler import StoryFiller
+from task import Task
 
 
 class TaskManager:
@@ -16,6 +14,7 @@ class TaskManager:
         self.all_results = []
         self.update_task_lists()
         self.get_next_task = None
+        self.story_filler = StoryFiller()
 
     def update_task_lists(self):
         self.completed_tasks = [t for t in self.tasks if t.done]
@@ -69,20 +68,21 @@ class TaskManager:
         return deets
 
 
-def make_example_data(num_fns = 10):
+def make_example_data(num_fns=10):
     def make_fn(i):
         def fn():
             time.sleep(i * 2)
             print(f"Task {i} completed")
             return i
+
         return fn
+
     return [Task(f"Task {i}", "Waiting", make_fn(i)) for i in range(num_fns)]
 
 
 if __name__ == "__main__":
-    story_filler = StoryFiller()
     pm = TaskManager(make_example_data())
-    pm.get_next_task = story_filler.get_next_task
+    pm.get_next_task = pm.story_filler.get_next_task
     while len(pm.incomplete_tasks) > 0:
         pm.make_progress()
         time.sleep(1)

@@ -1,4 +1,3 @@
-from task import Task
 from content_data import *
 from gpt.gpt import prompt_completion_chat
 
@@ -14,5 +13,10 @@ class StoryFiller:
                 ans = prompt_completion_chat(prompt, system_description="You are a brilliant writer.")
                 print(f"Task completed, result: {ans}")
                 return ans
+
             return fn
-        return None#Task("Fill Story", "StoryFiller", make_fn())
+
+        return None  # Task("Fill Story", "StoryFiller", make_fn())
+
+    def is_story_done(self):
+        return self.story.paragraphs >= 4

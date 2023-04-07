@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Story Generation</title>
+    <style>
+        /* Define the styles for the panels */
+        .panel {
+            display: inline-block;
+            vertical-align: top;
+            width: 30%;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid black;
+            box-sizing: border-box;
+        }
+
+        /* Define the styles for the input boxes */
+        input {
+            display: block;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Define the styles for the button */
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Define the styles for the JSON panel */
+        pre {
+            white-space: pre-wrap;
+        }
+
+        /* Define the styles for the center panel */
+        .center-panel {
+            text-align: center;
+        }
+
+        .center-panel img {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function shouldRefresh() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/should_refresh', false);
+            xhr.send();
+            return xhr.responseText === 'True';
+        }
+
+        function refreshPage() {
+            setTimeout(function () {
+                if (shouldRefresh()) {
+                    location.reload();
+                } else {
+                    refreshPage();
+                }
+            }, 1000);  // check every second
+        }
+
+        window.onload = function () {
+            refreshPage();
+        }
+    </script>
+</head>
+<body>
+<!-- Left Panel -->
+<div class="panel">
+    <h2 style="text-align: center;">Story Parameters</h2>
+    <form method="post" action="{{ url_for('new_story') }}">
+        <label for="tone">A one sentence story that is:</label>
+        <input type="text" id="tone" name="tone" value="{{ tone }}"><br>
+
+        <label for="protagonist">About a:</label>
+        <input type="text" id="protagonist" name="protagonist" value="{{ protagonist }}"><br>
+
+        <label for="macguffin">Who goes on an adventure and finds:</label>
+        <input type="text" id="macguffin" name="macguffin" value="{{ macguffin }}"><br>
+
+        <label for="style_inspo">In the style of:</label>
+        <input type="text" id="style_inspo" name="style_inspo" value="{{ style_inspo }}"><br>
+
+        <input type="submit" value="New Story">
+    </form>
+</div>
+
+<!-- Center Panel -->
+<div class="panel center-panel">
+    <h2>The Story So Far</h2>
+    <pre><br>{{ top_text }}<br></pre>
+    <img src="{{ image_url }}" class="small-image" style="width: 256px; height: 256px;">
+    {#    {% if bottom_text %}#}
+    <pre style="text-align: left;">{{ bottom_text }}</pre>
+    {#    {% endif %}#}
+</div>
+
+<!-- Right Panel -->
+<div class="panel">
+    <h2 style="text-align: center;">Deets</h2>
+    <pre>{{ details_panel }}</pre>
+</div>
+</body>
+</html>
